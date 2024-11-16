@@ -1,6 +1,7 @@
 package com.example.springboot.controllers;
 
 import com.example.springboot.dtos.ProductRecordDto;
+import com.example.springboot.enums.Messages;
 import com.example.springboot.models.ProductModel;
 import com.example.springboot.repositories.ProductRepository;
 import jakarta.validation.Valid;
@@ -50,32 +51,30 @@ public class ProductController {
         UUID id;
         try {
             id = UUID.fromString(idString);
+            Optional<ProductModel> product0 = productRepo.findById(id);
+
+            return product0.<ResponseEntity<Object>>map(
+                    productModel -> ResponseEntity.status(HttpStatus.OK).body(productModel)).orElseGet(()
+                    -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(Messages.ERRO_PRODUTO_NAO_ENCONTRADO));
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto não encontrado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Messages.ERRO_PRODUTO_NAO_ENCONTRADO);
         }
-
-        Optional<ProductModel> product0 = productRepo.findById(id);
-
-        if (product0.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto não encontrado");
-        }
-
-        return ResponseEntity.status(HttpStatus.OK).body(product0.get());
     }
 
     @PutMapping("/products/{id}")
-    public ResponseEntity<Object> updateProduct(@PathVariable(value = "id") String idString, @RequestBody @Valid ProductRecordDto productRecordDto){
+    public ResponseEntity<Object> updateProduct(@PathVariable(value = "id") String idString,
+                                                @RequestBody @Valid ProductRecordDto productRecordDto){
         UUID id;
         try {
             id = UUID.fromString(idString);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto não encontrado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Messages.ERRO_PRODUTO_NAO_ENCONTRADO);
         }
 
         Optional<ProductModel> product0 = productRepo.findById(id);
 
         if (product0.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto não encontrado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Messages.ERRO_PRODUTO_NAO_ENCONTRADO);
         }
 
         var productModel = new ProductModel();
@@ -89,16 +88,16 @@ public class ProductController {
         try {
             id = UUID.fromString(idString);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto não encontrado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Messages.ERRO_PRODUTO_NAO_ENCONTRADO);
         }
 
         Optional<ProductModel> product0 = productRepo.findById(id);
 
         if (product0.isEmpty()){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Produto não encontrado");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Messages.ERRO_PRODUTO_NAO_ENCONTRADO);
         }
 
         productRepo.delete(product0.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Produto deletado com sucesso!");
+        return ResponseEntity.status(HttpStatus.OK).body(Messages.MENSAGEM_PRODUTO_DELETADO);
     }
 }
